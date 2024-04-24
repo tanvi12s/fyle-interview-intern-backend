@@ -54,3 +54,17 @@ pytest -vvv -s tests/
 # pytest --cov
 # open htmlcov/index.html
 ```
+### Using Docker
+1. Build the Docker Image
+```
+docker build -t <app_name> .
+```
+2. Run the Docker container
+```
+docker run -d -p 5000:5000 <app_name>
+```
+Also, the docker container can be built and started using
+```
+docker-compose up -d --build
+```
+
