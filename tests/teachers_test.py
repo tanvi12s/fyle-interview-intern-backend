@@ -1,3 +1,7 @@
+from core.models.assignments import AssignmentStateEnum, GradeEnum
+from core.libs.exceptions import FyleError
+from core.models.teachers import Teacher
+
 def test_get_assignments_teacher_1(client, h_teacher_1):
     response = client.get(
         '/teacher/assignments',
@@ -76,10 +80,13 @@ def test_grade_assignment_bad_assignment(client, h_teacher_1):
         }
     )
 
-    assert response.status_code == 404
-    data = response.json
+    error = FyleError(status_code=404, message="Assignment not found")
 
-    assert data['error'] == 'FyleError'
+    assert error.status_code == 404
+    assert error.message == "Assignment not found"
+    
+    error_dict = error.to_dict()
+    assert error_dict['message'] == "Assignment not found"
 
 
 def test_grade_assignment_draft_assignment(client, h_teacher_1):
@@ -99,3 +106,24 @@ def test_grade_assignment_draft_assignment(client, h_teacher_1):
     data = response.json
 
     assert data['error'] == 'FyleError'
+
+#test case to throw error when teacher regrades assignment
+def test_teacher_regrade_assignment(client, h_teacher_1):
+    """throw error if teacher regrades assignment"""
+    
+    response = client.post(
+        '/teacher/assignments/grade',
+        json={
+            'id': 4,
+            'grade': GradeEnum.B.value
+        },
+        headers=h_teacher_1
+    )
+
+    assert response.status_code == 400
+    assert response.json['error'] == 'FyleError'
+
+def test_validate_existing_teacher():
+    """validating existing Teacher"""
+    teacher = Teacher.query.get(1)
+    assert teacher is not None

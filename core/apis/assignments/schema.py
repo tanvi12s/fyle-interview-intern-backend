@@ -2,6 +2,7 @@ from marshmallow import Schema, EXCLUDE, fields, post_load
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema, auto_field
 from marshmallow_enum import EnumField
 from core.models.assignments import Assignment, GradeEnum
+from core.models.teachers import Teacher
 from core.libs.helpers import GeneralObject
 
 
@@ -49,3 +50,17 @@ class AssignmentGradeSchema(Schema):
     def initiate_class(self, data_dict, many, partial):
         # pylint: disable=unused-argument,no-self-use
         return GeneralObject(**data_dict)
+
+class TeacherSchema(Schema):
+    class Meta:
+        unknown = EXCLUDE
+
+    created_at = fields.DateTime(dump_only=True, allow_none=False)
+    id = fields.Integer(required=True, allow_none=False)
+    updated_at = fields.DateTime(dump_only=True, allow_none=False)
+    user_id = fields.Integer(required=True, allow_none=False)
+
+    @post_load
+    def initiate_class(self, data_dict, many, partial):
+        # pylint: disable=unused-argument,no-self-use
+        return Teacher(**data_dict)
